@@ -1,0 +1,3 @@
+terraform init -backend-config="confvalues.config"
+terraform plan -var-file="infrastructure.tfvars"
+terraform apply -var-file="infrastructure.tfvars"
