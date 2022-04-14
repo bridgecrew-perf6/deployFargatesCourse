@@ -26,9 +26,9 @@ resource "aws_security_group" "alb-security-group" {
   vpc_id      = data.terraform_remote_state.networkInfrastructure.outputs.vpc_id
 
   ingress {
-    from_port   = 443
+    from_port   = 80
     protocol    = "TCP"
-    to_port     = 443
+    to_port     = 80
     cidr_blocks = [var.alb-sf-cidr-blocks]
   }
 

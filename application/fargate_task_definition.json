@@ -1,0 +1,22 @@
+[
+  {
+    "name": "${TASK_DEFINITION_NAME}",
+    "image": "${DOCKER_IMAGE_URL}",
+    "essential": true,
+    "environment": [{
+      "name": "spring_profiles_active",
+      "value": "${SPRING_PROFILE}"
+    }],
+    "portMappings": [{
+      "containerPort": ${DOCKER_CONTAINER_PORT}
+    }],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${ECS_SERVICE_NAME}-LogGroup",
+        "awslogs-region": "${REGION}",
+        "awslogs-stream-prefix": "${ECS_SERVICE_NAME}-LogGroup-stream"
+      }
+    }
+  }
+]
