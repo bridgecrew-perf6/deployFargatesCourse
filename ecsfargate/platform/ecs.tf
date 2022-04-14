@@ -11,8 +11,8 @@ data "terraform_remote_state" "networkInfrastructure" {
 
   config = {
     region = var.aws_region
-    bucket = var.infrastructureStateBucket
-    key    = var.infrastructureStateKey
+    bucket = var.networkStateBucket
+    key    = var.networkStateKey
   }
 }
 
@@ -56,8 +56,8 @@ resource "aws_alb_target_group" "fargates_cluster_alb_tg" {
 
 resource "aws_alb_listener" "fargates_cluster_alb_tg" {
   load_balancer_arn = aws_alb.fargates_cluster_alb.arn
-  port              = 443
-  protocol          = "HTTPS"
+  port              = 80
+  protocol          = "HTTP"
   default_action {
     type             = "forward"
     target_group_arn = aws_alb_target_group.fargates_cluster_alb_tg.arn
@@ -69,20 +69,19 @@ resource "aws_alb_listener" "fargates_cluster_alb_tg" {
 resource "aws_iam_role" "fargates_cluster_iamrole" {
   name               = "${var.clusterName}-IAM-ROLE"
   assume_role_policy = <<EOF
-    {
-      "Version":"2012-10-17",
-      "Statement":[
-        {
-          "Effect":"Allow",
-          "Principal":
-          {
-            "Service":["ecs.amazonaws.com", "ec2.amazonaws.com", "application-autoscaling.amazonaws.com"]
-          },
-          "Action":"sts:AssumeRole"
-        }
-      ]
-    }
-  EOF
+{
+"Version": "2012-10-17",
+"Statement": [
+ {
+   "Effect": "Allow",
+   "Principal": {
+     "Service": ["ecs.amazonaws.com", "ec2.amazonaws.com", "application-autoscaling.amazonaws.com"]
+   },
+   "Action": "sts:AssumeRole"
+  }
+  ]
+ }
+EOF
 }
 
 resource "aws_iam_role_policy" "ecs-course-cluster-iamrole-policy" {

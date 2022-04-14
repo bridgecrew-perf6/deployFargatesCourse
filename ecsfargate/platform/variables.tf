@@ -4,12 +4,11 @@ variable "aws_region" {
   description = "aws_region"
 }
 
-variable "infrastructureStateBucket" {
+variable "networkStateBucket" {
   type = string
 }
 
-
-variable "infrastructureStateKey" {
+variable "networkStateKey" {
   type = string
 }
 
