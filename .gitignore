@@ -2,3 +2,11 @@
 **/.terraform.lock.hcl
 **/.terraform/providers
 **/.terraform/terraform.tfstate
+**/.iml
+**/mvnw
+**/mvnw.cmd
+**/*.jar
+**/target/
+**/.terraform
+
+

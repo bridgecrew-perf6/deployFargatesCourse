@@ -18,24 +18,18 @@ data "terraform_remote_state" "platformInfrastructure" {
 
 
 data "template_file" "fargate_task_definition_template" {
-  template = file("fargate_task_definition.json")
+  template = file("task_definition.json")
 
   vars = {
-    ECS_SERVICE_NAME      = var.ECS_SERVICE_NAME
-    TASK_DEFINITION_NAME  = var.TASK_DEFINITION_NAME
-    DOCKER_IMAGE_URL      = var.DOCKER_IMAGE_URL
-    SPRING_PROFILE        = var.SPRING_PROFILE
-    DOCKER_CONTAINER_PORT = var.DOCKER_CONTAINER_PORT
-    REGION                = var.aws_region
-
+    docker_image_url = var.docker_image_url
   }
 }
 
-resource "aws_ecs_task_definition" "spring-app-task" {
+resource "aws_ecs_task_definition" "spring_app_task" {
   container_definitions    = data.template_file.fargate_task_definition_template.rendered
-  family                   = var.ECS_SERVICE_NAME
-  cpu                      = var.TASK_CPU
-  memory                   = var.TASK_MEMORY
+  family                   = var.ecs_service_name
+  memory                   = "512"
+  cpu                      = "256"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.ecs_task_iamrole.arn
@@ -43,7 +37,7 @@ resource "aws_ecs_task_definition" "spring-app-task" {
 }
 
 resource "aws_iam_role" "ecs_task_iamrole" {
-  name               = "${var.ECS_SERVICE_NAME}-IAM-ROLE"
+  name               = "${var.ecs_service_name}-IAM-ROLE"
   assume_role_policy = <<EOF
 {
 "Version": "2012-10-17",
@@ -62,7 +56,7 @@ EOF
 
 
 resource "aws_iam_role_policy" "ecs-task-iamrole-policy" {
-  name   = "${var.ECS_SERVICE_NAME}-iam-policy"
+  name   = "${var.ecs_service_name}-iam-policy"
   role   = aws_iam_role.ecs_task_iamrole.id
   policy = <<EOF
 {
@@ -86,7 +80,7 @@ EOF
 
 
 resource "aws_security_group" "spring-app-security-group" {
-  name        = "${var.ECS_SERVICE_NAME}-APP-SG"
+  name        = "${var.ecs_service_name}-APP-SG"
   description = "SG IN/OUT SPRING APP"
   vpc_id      = data.terraform_remote_state.platformInfrastructure.outputs.vpc_id
 
@@ -106,8 +100,8 @@ resource "aws_security_group" "spring-app-security-group" {
 }
 
 resource "aws_alb_target_group" "ecs-task-target-group" {
-  name        = "${var.ECS_SERVICE_NAME}-ALB-TG"
-  port        = var.DOCKER_CONTAINER_PORT
+  name        = "${var.ecs_service_name}-ALB-TG"
+  port        = var.docker_container_port
   protocol    = "HTTP"
   vpc_id      = data.terraform_remote_state.platformInfrastructure.outputs.vpc_id
   target_type = "ip"
@@ -124,8 +118,8 @@ resource "aws_alb_target_group" "ecs-task-target-group" {
 }
 
 resource "aws_ecs_service" "spring_app_ecs_service" {
-  name            = var.ECS_SERVICE_NAME
-  task_definition = aws_ecs_task_definition.spring-app-task.id
+  name            = var.ecs_service_name
+  task_definition = aws_ecs_task_definition.spring_app_task.id
   desired_count   = 1
   cluster         = data.terraform_remote_state.platformInfrastructure.outputs.ecs_cluster_name
   launch_type     = "FARGATE"
@@ -137,8 +131,8 @@ resource "aws_ecs_service" "spring_app_ecs_service" {
   }
 
   load_balancer {
-    container_name   = var.ECS_SERVICE_NAME
-    container_port   = var.DOCKER_CONTAINER_PORT
+    container_name   = var.ecs_service_name
+    container_port   = var.docker_container_port
     target_group_arn = aws_alb_target_group.ecs-task-target-group.arn
   }
 }
@@ -150,9 +144,13 @@ resource "aws_alb_listener_rule" "spring-app-listener-rule" {
     type             = "forward"
     target_group_arn = aws_alb_target_group.ecs-task-target-group.arn
   }
-  condition {}
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
+  }
 }
 
 resource "aws_cloudwatch_log_group" "spring-app-cloudwatch-group" {
-  name = "${var.ECS_SERVICE_NAME}-logs-group"
+  name = "${var.ecs_service_name}-logs-group"
 }

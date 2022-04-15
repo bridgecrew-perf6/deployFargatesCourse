@@ -13,12 +13,7 @@ variable "platformStateKey" {
   type = string
 }
 
-variable "ECS_SERVICE_NAME" {}
-variable "TASK_DEFINITION_NAME" {}
-variable "DOCKER_IMAGE_URL" {}
-variable "SPRING_PROFILE" {}
-variable "DOCKER_CONTAINER_PORT" {}
-variable "TASK_MEMORY" {}
-variable "TASK_CPU" {}
-
+variable "ecs_service_name" {}
+variable "docker_image_url" {}
+variable "docker_container_port" {}
 

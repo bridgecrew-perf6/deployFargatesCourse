@@ -1,9 +1,5 @@
 platformStateBucket   = "fargate-course-terraform-state"
 platformStateKey      = "platform.tfstate"
-ECS_SERVICE_NAME      = "SPRING-BOOT-APP-SERVICE"
-TASK_DEFINITION_NAME  = "SPRING-BOOT-APP-TASK"
-DOCKER_IMAGE_URL      = "URL_PATH"
-SPRING_PROFILE        = "default"
-TASK_MEMORY           = 512
-TASK_CPU              = 256
-DOCKER_CONTAINER_PORT = "8080"
+ecs_service_name      = "springbootapp"
+docker_container_port = 8080
+

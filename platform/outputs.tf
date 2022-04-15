@@ -29,4 +29,3 @@ output "ecs_cluster_role_name" {
 output "ecs_cluster_role_arn" {
   value = aws_iam_role.fargates_cluster_iamrole.arn
 }
-

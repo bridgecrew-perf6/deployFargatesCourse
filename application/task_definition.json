@@ -1,0 +1,14 @@
+[
+  {
+    "name": "springbootapp",
+    "image": "${docker_image_url}",
+    "cpu": 256,
+    "memory": 512,
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 8080
+      }
+    ]
+  }
+]
